@@ -1,0 +1,59 @@
+# Weekly database backup to a separate PRIVATE repository (NFR-08), plus a
+# keep-alive ping every 3 days so the free Supabase project is not paused
+# after a week without activity.
+#
+# Secrets:
+#   SUPABASE_DB_URL  – Supabase → Project Settings → Database → Connection
+#                      string (URI, session pooler), including the password.
+#   BACKUP_REPO      – e.g. my-org/project-tracker-backups (must be private)
+#   BACKUP_TOKEN     – fine-grained token with Contents: read/write on BACKUP_REPO only
+name: Database backup
+
+on:
+  schedule:
+    - cron: '17 2 * * 5'      # backup: Fridays 02:17 UTC
+    - cron: '41 3 */3 * *'    # keep-alive: every 3 days
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  keepalive:
+    if: github.event.schedule == '41 3 */3 * *'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Touch the database
+        env:
+          DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: docker run --rm postgres:17 psql "$DB_URL" -tAc 'select count(*) from public.projects'
+
+  backup:
+    if: github.event.schedule != '41 3 */3 * *'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dump schema and data
+        env:
+          DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+        run: |
+          mkdir -p out
+          docker run --rm postgres:17 pg_dump "$DB_URL" \
+            --schema=public --schema=auth --no-owner --no-privileges > out/backup.sql
+          test -s out/backup.sql
+          gzip -9 out/backup.sql
+
+      - name: Push to the private backup repository
+        env:
+          BACKUP_REPO: ${{ secrets.BACKUP_REPO }}
+          BACKUP_TOKEN: ${{ secrets.BACKUP_TOKEN }}
+        run: |
+          git clone --depth 1 "https://x-access-token:${BACKUP_TOKEN}@github.com/${BACKUP_REPO}.git" backups
+          name="$(date -u +%Y-%m-%d).sql.gz"
+          mkdir -p backups/weekly && cp out/backup.sql.gz "backups/weekly/$name"
+          # keep the latest 12 weekly backups
+          ls -1 backups/weekly/*.sql.gz | sort | head -n -12 | xargs -r rm --
+          cd backups
+          git config user.name "backup-bot"
+          git config user.email "backup-bot@users.noreply.github.com"
+          git add -A weekly
+          git commit -m "Weekly backup $name" && git push
