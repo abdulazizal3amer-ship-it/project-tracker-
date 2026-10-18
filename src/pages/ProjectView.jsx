@@ -19,6 +19,7 @@ import { useAsync } from '../lib/useAsync.js';
 import { useUsers } from '../lib/users.jsx';
 import { useI18n } from '../i18n/index.jsx';
 import { NewTaskModal, TaskDetailModal } from '../components/TaskModals.jsx';
+import Attachments from '../components/Attachments.jsx';
 import { Avatar, AvatarStack, DueDate, EmptyState, ErrorBox, PriorityBadge, ProgressBar, Spinner, StatusBadge, UserName } from '../components/ui.jsx';
 import { ProjectFormModal, ProjectStatusBadge } from './Projects.jsx';
 
@@ -479,7 +480,7 @@ export default function ProjectView() {
 
       <div className="flex flex-wrap items-center gap-3">
         <div className="inline-flex rounded-lg border border-slate-300 bg-white p-0.5">
-          {['kanban', 'list', 'members'].map((v) => (
+          {['kanban', 'list', 'members', 'files'].map((v) => (
             <button
               key={v}
               onClick={() => setView(v)}
@@ -489,7 +490,7 @@ export default function ProjectView() {
             </button>
           ))}
         </div>
-        {view !== 'members' && <TaskFilters filters={filters} setFilters={setFilters} memberIds={memberIds} />}
+        {(view === 'kanban' || view === 'list') && <TaskFilters filters={filters} setFilters={setFilters} memberIds={memberIds} />}
       </div>
 
       <ErrorBox error={moveError} />
@@ -507,6 +508,14 @@ export default function ProjectView() {
       )}
       {view === 'list' && <TaskTable tasks={filtered} assigneeMap={assigneeMap} onOpen={(task) => openTask(task.id)} />}
       {view === 'members' && <Members project={project} memberIds={memberIds} onChanged={() => reload({ silent: true })} />}
+      {view === 'files' && (
+        <Attachments
+          projectId={project.id}
+          canManage={manager}
+          readOnly={project.status === 'archived'}
+          taskTitles={Object.fromEntries(tasks.map((tk) => [tk.id, tk.title]))}
+        />
+      )}
 
       <NewTaskModal
         open={Boolean(newTask)}

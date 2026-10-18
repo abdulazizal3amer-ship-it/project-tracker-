@@ -222,5 +222,16 @@
   "tasks.startsOnWeekend": "تاريخ البداية يوم إجازة؛ يبدأ العدّ من الأحد التالي.",
   "tasks.scheduleSummary": "تبدأ {start} · {days} يوم عمل",
   "errors.workDaysInvalid": "عدد أيام العمل رقم صحيح من 1 إلى 365",
-  "errors.startDateRequired": "حدّد تاريخ البداية مع عدد أيام العمل"
+  "errors.startDateRequired": "حدّد تاريخ البداية مع عدد أيام العمل",
+  "view.files": "المرفقات",
+  "attachments.title": "المرفقات",
+  "attachments.add": "إرفاق ملف",
+  "attachments.uploading": "جارٍ الرفع…",
+  "attachments.dropHint": "أو اسحب الملفات وأفلتها هنا (حتى {max} للملف)",
+  "attachments.empty": "لا توجد مرفقات.",
+  "attachments.tooBig": "الملف «{name}» أكبر من الحد المسموح ({max}).",
+  "attachments.confirmDelete": "حذف المرفق «{name}»؟",
+  "attachments.task": "مهمة",
+  "activity.attachment_added": "أرفق الملف {to}",
+  "activity.attachment_removed": "حذف المرفق {from}"
 }

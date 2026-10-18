@@ -222,5 +222,16 @@
   "tasks.startsOnWeekend": "The start date is a day off; counting starts the following Sunday.",
   "tasks.scheduleSummary": "Starts {start} · {days} working days",
   "errors.workDaysInvalid": "Working days must be a whole number from 1 to 365",
-  "errors.startDateRequired": "Set a start date along with the working days"
+  "errors.startDateRequired": "Set a start date along with the working days",
+  "view.files": "Files",
+  "attachments.title": "Files",
+  "attachments.add": "Attach file",
+  "attachments.uploading": "Uploading…",
+  "attachments.dropHint": "or drag and drop files here (up to {max} each)",
+  "attachments.empty": "No files yet.",
+  "attachments.tooBig": "“{name}” is larger than the limit ({max}).",
+  "attachments.confirmDelete": "Delete “{name}”?",
+  "attachments.task": "Task",
+  "activity.attachment_added": "attached {to}",
+  "activity.attachment_removed": "removed the file {from}"
 }

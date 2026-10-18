@@ -13,6 +13,7 @@ run supabase/migrations/001_tables.sql
 run supabase/migrations/002_rls.sql
 run supabase/migrations/004_team_members.sql
 run supabase/migrations/005_task_schedule.sql
+run supabase/migrations/006_attachments.sql
 run tests/sql/rls_test.sql
 
 echo "SQL tests passed"

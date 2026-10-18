@@ -316,3 +316,22 @@ export function addWorkDays(startISO, days) {
     date = addDays(date, 1);
   }
 }
+
+// ---------------------------------------------------------------------
+// Attachments — stored as <project>/<task | 'project'>/<random>.<ext>.
+// The original file name (Arabic included) is kept in the database; the
+// storage key stays ASCII so every browser and the API accept it.
+// ---------------------------------------------------------------------
+export const MAX_ATTACHMENT_BYTES = 5 * 1024 * 1024;
+
+export function attachmentPath(projectId, taskId, fileName, randomId) {
+  const match = /\.([A-Za-z0-9]{1,10})$/.exec(fileName ?? '');
+  const ext = match ? `.${match[1].toLowerCase()}` : '';
+  return `${projectId}/${taskId ?? 'project'}/${randomId}${ext}`;
+}
+
+export function formatBytes(bytes) {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(bytes < 10 * 1024 ? 1 : 0)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}

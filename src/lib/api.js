@@ -1,6 +1,7 @@
 // Data access. Every call goes through RLS, so a query only ever returns
 // what the signed-in user is allowed to see.
 import { fetchAll, supabase } from './supabase.js';
+import { attachmentPath } from './logic.js';
 
 const TASK_COLUMNS =
   'id, project_id, title, description, status, priority, due_date, created_by, created_at, completed_at, completed_by, start_date, work_days';
@@ -156,6 +157,58 @@ export async function listActivity(taskId) {
   return check(
     await supabase.from('activity_log').select('*').eq('task_id', taskId).order('created_at', { ascending: false }).limit(100),
   );
+}
+
+// Attachments ------------------------------------------------------------
+const BUCKET = 'attachments';
+
+export async function listAttachments({ projectId, taskId }) {
+  let q = supabase.from('attachments').select('*').order('created_at', { ascending: false });
+  q = taskId ? q.eq('task_id', taskId) : q.eq('project_id', projectId);
+  return check(await q);
+}
+
+// Upload the file, then record it; remove the file again if recording fails.
+export async function uploadAttachment({ projectId, taskId, file, userId }) {
+  const path = attachmentPath(projectId, taskId, file.name, crypto.randomUUID());
+  const { error: upErr } = await supabase.storage.from(BUCKET).upload(path, file, {
+    contentType: file.type || 'application/octet-stream',
+    upsert: false,
+  });
+  if (upErr) throw upErr;
+  const { data, error } = await supabase
+    .from('attachments')
+    .insert({
+      project_id: projectId,
+      task_id: taskId ?? null,
+      file_name: file.name,
+      storage_path: path,
+      size: file.size,
+      content_type: file.type || null,
+      uploaded_by: userId,
+    })
+    .select()
+    .single();
+  if (error) {
+    await supabase.storage.from(BUCKET).remove([path]);
+    throw error;
+  }
+  return data;
+}
+
+// Short-lived signed link that downloads with the original file name.
+export async function attachmentUrl(attachment, { download = true } = {}) {
+  const { data, error } = await supabase.storage
+    .from(BUCKET)
+    .createSignedUrl(attachment.storage_path, 60, download ? { download: attachment.file_name } : undefined);
+  if (error) throw error;
+  return data.signedUrl;
+}
+
+export async function deleteAttachment(attachment) {
+  const removed = check(await supabase.from('attachments').delete().eq('id', attachment.id).select('id'));
+  if (!removed.length) throw Object.assign(new Error('forbidden'), { code: '42501' });
+  await supabase.storage.from(BUCKET).remove([attachment.storage_path]);
 }
 
 // Notifications -----------------------------------------------------------

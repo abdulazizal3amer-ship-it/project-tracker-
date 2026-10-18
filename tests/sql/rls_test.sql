@@ -271,4 +271,62 @@ select test.ok(exists (select 1 from public.activity_log where task_id = (select
                        and action = 'due_date' and new_value = '2026-10-26'), 'schedule change logged');
 select test.throws($$update public.tasks set work_days = 0 where id = (select id from ids where name = 'sched')$$, 'work days must be at least 1');
 
+-- ---------------------------------------------------------------------
+-- Attachments (projects and tasks) + storage objects
+-- ---------------------------------------------------------------------
+select test.ok((select not public and file_size_limit = 5242880 from storage.buckets where id = 'attachments'),
+               'private attachments bucket with 5 MB limit');
+
+select test.as_user(:PM1);
+insert into storage.objects (bucket_id, name) values ('attachments', '10000000-0000-0000-0000-000000000001/project/a.pdf');
+insert into public.attachments (project_id, file_name, storage_path, size, uploaded_by)
+values (:P1, 'خطة المشروع.pdf', '10000000-0000-0000-0000-000000000001/project/a.pdf', 1000, auth.uid());
+insert into public.attachments (task_id, file_name, storage_path, size, uploaded_by)
+values ((select id from ids where name = 'sched'), 'spec.docx', '10000000-0000-0000-0000-000000000001/x/b.docx', 2000, auth.uid());
+select test.throws($$insert into public.attachments (project_id, file_name, storage_path, size, uploaded_by)
+                     values ('10000000-0000-0000-0000-000000000001', 'big.zip', '10000000-0000-0000-0000-000000000001/project/c.zip',
+                             6000000, auth.uid())$$, 'files over 5 MB are refused');
+select test.throws($$insert into public.attachments (project_id, file_name, storage_path, size, uploaded_by)
+                     values ('10000000-0000-0000-0000-000000000001', 'x', 'elsewhere/x', 10, auth.uid())$$,
+                   'path must sit in the project folder');
+reset role;
+select test.ok((select project_id from public.attachments where file_name = 'spec.docx') = :P1,
+               'task attachment takes its task''s project');
+select test.ok(exists (select 1 from public.activity_log where action = 'attachment_added' and new_value = 'spec.docx'),
+               'task attachment logged in activity');
+
+select test.as_user(:PM3);
+select test.ok((select count(*) from public.attachments) = 0, 'pm outside the project sees no attachments');
+select test.ok((select count(*) from storage.objects) = 0, 'pm outside the project sees no files');
+select test.throws($$insert into storage.objects (bucket_id, name)
+                     values ('attachments', '10000000-0000-0000-0000-000000000001/project/evil.pdf')$$,
+                   'pm outside the project cannot upload');
+select test.throws($$insert into public.attachments (project_id, file_name, storage_path, size, uploaded_by)
+                     values ('10000000-0000-0000-0000-000000000001', 'x', '10000000-0000-0000-0000-000000000001/project/x', 1, auth.uid())$$,
+                   'pm outside the project cannot add attachment rows');
+delete from public.attachments;
+delete from storage.objects;
+reset role;
+select test.ok((select count(*) from public.attachments) = 2, 'outsider cannot delete attachments');
+
+-- PM2 is a member of the project (added earlier) but not its manager.
+select test.as_user(:PM2);
+select test.ok((select count(*) from public.attachments) = 2, 'project member sees project and task attachments');
+select test.ok((select count(*) from storage.objects) = 1, 'project member sees the files');
+insert into storage.objects (bucket_id, name) values ('attachments', '10000000-0000-0000-0000-000000000001/project/pm2.txt');
+insert into public.attachments (project_id, file_name, storage_path, size, uploaded_by)
+values (:P1, 'pm2.txt', '10000000-0000-0000-0000-000000000001/project/pm2.txt', 5, auth.uid());
+delete from public.attachments where file_name = 'pm2.txt';
+reset role;
+select test.ok(not exists (select 1 from public.attachments where file_name = 'pm2.txt'), 'uploader deletes own attachment');
+
+select test.as_user(:PM1);
+delete from public.attachments where file_name = 'spec.docx';
+delete from storage.objects where name like '%/pm2.txt';
+reset role;
+select test.ok(not exists (select 1 from public.attachments where file_name = 'spec.docx'), 'project manager deletes any attachment');
+select test.ok(not exists (select 1 from storage.objects where name like '%/pm2.txt'), 'project manager deletes any file');
+select test.ok(exists (select 1 from public.activity_log where action = 'attachment_removed' and old_value = 'spec.docx'),
+               'removal logged in activity');
+
 \echo 'all RLS tests passed'

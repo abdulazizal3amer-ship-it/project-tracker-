@@ -5,6 +5,7 @@ import { addWorkDays, allowedAssignees, canManageProject, canMoveTask, isWeekend
 import { useUsers } from '../lib/users.jsx';
 import { useI18n } from '../i18n/index.jsx';
 import AssigneePicker from './AssigneePicker.jsx';
+import Attachments from './Attachments.jsx';
 import { CommentBody, MentionInput } from './MentionInput.jsx';
 import { Avatar, DueDate, ErrorBox, Field, Modal, Spinner, StatusBadge, UserName } from './ui.jsx';
 
@@ -314,7 +315,7 @@ export function TaskDetailModal({ taskId, project, memberIds, onClose, onChanged
 
             <div>
               <div className="mb-3 flex gap-1 border-b border-slate-200">
-                {['comments', 'activity'].map((k) => (
+                {['comments', 'attachments', 'activity'].map((k) => (
                   <button
                     key={k}
                     onClick={() => setTab(k)}
@@ -357,6 +358,8 @@ export function TaskDetailModal({ taskId, project, memberIds, onClose, onChanged
                     </div>
                   </div>
                 </div>
+              ) : tab === 'attachments' ? (
+                <Attachments projectId={project.id} taskId={task.id} canManage={manager} readOnly={project.status === 'archived'} compact />
               ) : (
                 <ul className="space-y-2">
                   {activity.map((a) => (
