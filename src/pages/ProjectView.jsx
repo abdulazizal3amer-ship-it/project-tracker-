@@ -275,7 +275,11 @@ function Members({ project, memberIds, onChanged }) {
                 <UserName userId={id} />
               </div>
               <div className="text-xs text-slate-500">
-                {id === project.manager_id ? t('projects.manager') : t(`role.${byId[id]?.role ?? 'member'}`)}
+                {id === project.manager_id
+                  ? t('projects.manager')
+                  : byId[id]?.job_title
+                    ? t(`job.${byId[id].job_title}`)
+                    : t(`role.${byId[id]?.role ?? 'member'}`)}
               </div>
             </div>
             {manager && id !== project.manager_id && (

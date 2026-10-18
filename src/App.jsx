@@ -54,7 +54,7 @@ function Gate() {
             <Route path="task/:id" element={<TaskRedirect />} />
             <Route path="my-tasks" element={<MyTasks />} />
             <Route path="profile" element={<Profile />} />
-            {profile.role === 'admin' && <Route path="users" element={<Users />} />}
+            <Route path="users" element={<Users />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
         </Routes>

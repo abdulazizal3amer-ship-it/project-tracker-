@@ -58,6 +58,15 @@ export function UserName({ userId }) {
   );
 }
 
+// Job title chip for team members (developer / analyst / tester).
+export function JobLabel({ userId }) {
+  const { byId } = useUsers();
+  const { t } = useI18n();
+  const job = byId[userId]?.job_title;
+  if (!job) return null;
+  return <span className="rounded bg-slate-100 px-1.5 py-0.5 text-[10px] font-medium text-slate-600">{t(`job.${job}`)}</span>;
+}
+
 const STATUS_STYLES = {
   new: 'bg-slate-100 text-slate-700',
   in_progress: 'bg-sky-100 text-sky-800',

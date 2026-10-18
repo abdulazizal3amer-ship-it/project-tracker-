@@ -14,7 +14,7 @@ export default function Layout() {
     { to: '/', label: t('nav.dashboard'), end: true },
     { to: '/projects', label: t('nav.projects') },
     { to: '/my-tasks', label: t('nav.myTasks') },
-    ...(profile.role === 'admin' ? [{ to: '/users', label: t('nav.users') }] : []),
+    { to: '/users', label: t('nav.users') },
   ];
 
   const toggleLang = () => {

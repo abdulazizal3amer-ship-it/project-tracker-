@@ -12,7 +12,9 @@ const corsHeaders = {
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
 
-const ROLES = ['admin', 'pm', 'member'];
+// Only system users (who sign in) are created here. Team members have no
+// account; managers add them directly from the Team screen.
+const ROLES = ['admin', 'pm'];
 
 function json(body: unknown, status = 200) {
   return new Response(JSON.stringify(body), {

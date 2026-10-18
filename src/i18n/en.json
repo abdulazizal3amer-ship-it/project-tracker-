@@ -1,15 +1,13 @@
 {
   "app.name": "Project Tracker",
   "app.notConfigured": "Supabase is not configured. Create .env.local with VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY (see README).",
-
   "nav.dashboard": "Dashboard",
   "nav.projects": "Projects",
   "nav.myTasks": "My tasks",
-  "nav.users": "Users",
+  "nav.users": "Team",
   "nav.profile": "Profile",
   "nav.signOut": "Sign out",
   "nav.language": "العربية",
-
   "common.save": "Save",
   "common.cancel": "Cancel",
   "common.close": "Close",
@@ -27,7 +25,6 @@
   "common.deactivated": "Deactivated",
   "common.you": "You",
   "common.retry": "Retry",
-
   "errors.required": "This field is required",
   "errors.endBeforeStart": "End date cannot be before the start date",
   "errors.atLeastOneAssignee": "Choose at least one assignee",
@@ -35,14 +32,13 @@
   "errors.passwordMismatch": "Passwords do not match",
   "errors.invalidCredentials": "Incorrect email or password",
   "errors.locked": "Sign-in is locked after 5 failed attempts. Try again in {minutes} min.",
-  "errors.deactivated": "This account is deactivated. Contact your administrator.",
+  "errors.deactivated": "This account can't sign in: it is deactivated or has no sign-in access.",
   "errors.email_exists": "This email is already used by another account",
   "errors.invalid_email": "Invalid email address",
   "errors.weak_password": "Password must be at least 8 characters",
   "errors.network": "Can't reach the server ({host}). Check your connection, the SUPABASE_URL secret in GitHub, and that no ad blocker is blocking supabase.co.",
   "errors.forbidden": "You don't have permission to do that",
   "errors.notFound": "Not found, or you don't have access",
-
   "auth.signIn": "Sign in",
   "auth.signingIn": "Signing in…",
   "auth.email": "Email",
@@ -59,26 +55,21 @@
   "auth.passwordChanged": "Password changed",
   "auth.resetLinkInvalid": "This password reset link is invalid or has expired. Request a new one.",
   "auth.idleSignedOut": "You were signed out after 8 hours of inactivity.",
-
   "role.admin": "Administrator",
   "role.pm": "Project manager",
   "role.member": "Team member",
-
   "status.new": "New",
   "status.in_progress": "In progress",
   "status.in_review": "In review",
   "status.done": "Done",
-
   "priority.low": "Low",
   "priority.medium": "Medium",
   "priority.high": "High",
   "priority.urgent": "Urgent",
-
   "projectStatus.active": "Active",
   "projectStatus.on_hold": "On hold",
   "projectStatus.completed": "Completed",
   "projectStatus.archived": "Archived",
-
   "dashboard.title": "Dashboard",
   "dashboard.greeting": "Hello, {name}",
   "dashboard.totalTasks": "Total tasks",
@@ -94,7 +85,6 @@
   "dashboard.noProjects": "No projects yet.",
   "dashboard.weekList": "Due this week",
   "dashboard.nothingThisWeek": "Nothing due this week.",
-
   "projects.title": "Projects",
   "projects.new": "New project",
   "projects.edit": "Edit project",
@@ -115,11 +105,9 @@
   "projects.confirmArchive": "Archiving hides the project from lists but keeps its data. Continue?",
   "projects.removeMemberConfirm": "Removing this member also removes them from their open tasks in this project. Continue?",
   "projects.addMember": "Add member",
-
   "view.kanban": "Kanban",
   "view.list": "List",
   "view.members": "Members",
-
   "tasks.new": "New task",
   "tasks.title": "Title",
   "tasks.description": "Description",
@@ -139,7 +127,6 @@
   "tasks.overdueBadge": "Overdue",
   "tasks.details": "Details",
   "tasks.createdBy": "Created by {name}",
-
   "filters.assignee": "Assignee",
   "filters.due": "Due",
   "filters.overdue": "Overdue",
@@ -147,12 +134,10 @@
   "filters.noDue": "No date",
   "filters.searchTitle": "Search by title…",
   "filters.hideDone": "Hide done",
-
   "comments.title": "Comments",
   "comments.placeholder": "Write a comment… use @ to mention a teammate",
   "comments.send": "Send",
   "comments.empty": "No comments yet.",
-
   "activity.title": "Activity",
   "activity.created": "created the task",
   "activity.status": "changed status from {from} to {to}",
@@ -162,7 +147,6 @@
   "activity.assigned": "assigned {to}",
   "activity.unassigned": "removed {from} from assignees",
   "activity.system": "System",
-
   "notifications.title": "Notifications",
   "notifications.empty": "No notifications.",
   "notifications.markAll": "Mark all as read",
@@ -172,13 +156,11 @@
   "notifications.status": "{actor} changed the status of: {message}",
   "notifications.due_soon": "Due tomorrow: {message}",
   "notifications.member_removed": "A member was removed from a project: {message}",
-
   "myTasks.title": "My tasks",
   "myTasks.subtitle": "Everything assigned to you across all projects, by due date",
   "myTasks.group": "Group ({count})",
-
-  "users.title": "Users",
-  "users.new": "New user",
+  "users.title": "Team",
+  "users.new": "New system user",
   "users.fullName": "Full name",
   "users.role": "Role",
   "users.status": "Status",
@@ -190,9 +172,22 @@
   "users.activate": "Activate",
   "users.lastLogin": "Last sign-in",
   "users.never": "Never",
-
   "profile.title": "Profile",
   "profile.language": "Preferred language",
   "profile.changePassword": "Change password",
-  "profile.saved": "Saved"
+  "profile.saved": "Saved",
+  "job.developer": "Developer",
+  "job.analyst": "Analyst",
+  "job.tester": "Tester",
+  "team.systemUsers": "System users",
+  "team.systemUsersHint": "The system admin and project managers — the only people who sign in.",
+  "team.members": "Team members",
+  "team.membersHint": "They don't sign in. Tasks are assigned to them to track each person's workload.",
+  "team.newMember": "New team member",
+  "team.jobTitle": "Job title",
+  "team.emailOptional": "Email (optional)",
+  "team.openTasks": "open tasks",
+  "team.noMembers": "No team members yet.",
+  "team.byJob": "Workload by job title",
+  "team.people": "{count} people"
 }

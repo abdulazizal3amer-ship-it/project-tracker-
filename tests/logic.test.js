@@ -15,6 +15,7 @@ import {
   insertMention,
   isDueWithin,
   isOverdue,
+  isTeamMember,
   mentionToken,
   mentionedUserIds,
   overdueTasks,
@@ -25,6 +26,7 @@ import {
   validatePassword,
   validateProject,
   validateTask,
+  workloadByJob,
   workloadByUser,
 } from '../src/lib/logic.js';
 
@@ -106,6 +108,29 @@ describe('progress and counts', () => {
       [U2]: { open: 1, overdue: 1 },
     });
     expect(groupAssignees(assignees)).toEqual({ g: [U1, U2], s: [U1], x: [U2] });
+  });
+});
+
+describe('team workload by job title', () => {
+  it('sums open and overdue tasks per job title for active team members', () => {
+    const people = [
+      { id: 'd1', role: 'member', job_title: 'developer', is_active: true },
+      { id: 'd2', role: 'member', job_title: 'developer', is_active: true },
+      { id: 't1', role: 'member', job_title: 'tester', is_active: true },
+      { id: 'a0', role: 'member', job_title: 'analyst', is_active: false },
+      { id: 'pm', role: 'pm', job_title: null, is_active: true },
+    ];
+    const workload = { d1: { open: 3, overdue: 1 }, d2: { open: 2, overdue: 0 }, a0: { open: 9, overdue: 9 }, pm: { open: 4, overdue: 4 } };
+    expect(workloadByJob(people, workload)).toEqual({
+      developer: { people: 2, open: 5, overdue: 1 },
+      analyst: { people: 0, open: 0, overdue: 0 },
+      tester: { people: 1, open: 0, overdue: 0 },
+    });
+  });
+  it('identifies team members (no login)', () => {
+    expect(isTeamMember({ role: 'member' })).toBe(true);
+    expect(isTeamMember({ role: 'pm' })).toBe(false);
+    expect(isTeamMember(undefined)).toBe(false);
   });
 });
 

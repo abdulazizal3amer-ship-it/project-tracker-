@@ -19,6 +19,23 @@ export async function updateUser(id, changes) {
   return check(await supabase.from('users').update(changes).eq('id', id).select().single());
 }
 
+// Team members (developer / analyst / tester) have no sign-in account.
+export async function createTeamMember({ full_name, job_title, email }) {
+  return check(
+    await supabase
+      .from('users')
+      .insert({
+        full_name: full_name.trim(),
+        job_title,
+        email: email?.trim().toLowerCase() || null,
+        role: 'member',
+        must_change_password: false,
+      })
+      .select()
+      .single(),
+  );
+}
+
 export async function createUser(payload) {
   const { data, error } = await supabase.functions.invoke('create-user', { body: payload });
   if (error) {

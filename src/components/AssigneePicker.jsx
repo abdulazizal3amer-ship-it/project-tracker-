@@ -1,6 +1,6 @@
 import { useI18n } from '../i18n/index.jsx';
 import { useUsers } from '../lib/users.jsx';
-import { Avatar } from './ui.jsx';
+import { Avatar, JobLabel } from './ui.jsx';
 
 // FR-09: pick one or many members, or "all project members" in one click.
 export default function AssigneePicker({ memberIds, value, onChange, disabled }) {
@@ -37,6 +37,7 @@ export default function AssigneePicker({ memberIds, value, onChange, disabled })
             />
             <Avatar userId={id} size="sm" />
             {byId[id]?.full_name}
+            <JobLabel userId={id} />
           </label>
         ))}
       </div>

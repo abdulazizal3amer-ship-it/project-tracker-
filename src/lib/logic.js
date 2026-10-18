@@ -4,7 +4,10 @@
 export const TASK_STATUSES = ['new', 'in_progress', 'in_review', 'done'];
 export const PRIORITIES = ['low', 'medium', 'high', 'urgent'];
 export const PROJECT_STATUSES = ['active', 'on_hold', 'completed', 'archived'];
-export const ROLES = ['admin', 'pm', 'member'];
+// Roles that sign in. Team members ('member') have no login and carry a
+// job title instead.
+export const LOGIN_ROLES = ['admin', 'pm'];
+export const JOB_TITLES = ['developer', 'analyst', 'tester'];
 
 const PRIORITY_RANK = { urgent: 0, high: 1, medium: 2, low: 3 };
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -84,6 +87,24 @@ export function workloadByUser(tasks, assignees, today = todayISO()) {
     if (isOverdue(task, today)) row.overdue += 1;
   }
   return result;
+}
+
+// Workload totals per job title (developer / analyst / tester), using the
+// per-person rows from workloadByUser. Only active team members count.
+export function workloadByJob(people, workload) {
+  const totals = Object.fromEntries(JOB_TITLES.map((j) => [j, { people: 0, open: 0, overdue: 0 }]));
+  for (const person of people) {
+    if (person.role !== 'member' || !person.is_active || !totals[person.job_title]) continue;
+    const row = totals[person.job_title];
+    row.people += 1;
+    row.open += workload[person.id]?.open ?? 0;
+    row.overdue += workload[person.id]?.overdue ?? 0;
+  }
+  return totals;
+}
+
+export function isTeamMember(person) {
+  return person?.role === 'member';
 }
 
 export function groupAssignees(assignees) {

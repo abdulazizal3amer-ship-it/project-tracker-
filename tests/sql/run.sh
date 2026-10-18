@@ -11,6 +11,7 @@ run() { psql -v ON_ERROR_STOP=1 -q -X -t -o /dev/null -d "$DB" -f "$1" 2>&1 | se
 run tests/sql/supabase_stub.sql
 run supabase/migrations/001_tables.sql
 run supabase/migrations/002_rls.sql
+run supabase/migrations/004_team_members.sql
 run tests/sql/rls_test.sql
 
 echo "SQL tests passed"

@@ -13,7 +13,7 @@ export function MentionInput({ value, onChange, memberIds, placeholder, onSubmit
   const candidates = mention
     ? memberIds
         .map((id) => byId[id])
-        .filter((u) => u?.is_active && u.full_name.toLowerCase().includes(mention.query.toLowerCase()))
+        .filter((u) => u?.is_active && u.role !== 'member' && u.full_name.toLowerCase().includes(mention.query.toLowerCase()))
         .slice(0, 6)
     : [];
 

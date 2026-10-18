@@ -15,7 +15,7 @@ import {
 import { useAsync } from '../lib/useAsync.js';
 import { useUsers } from '../lib/users.jsx';
 import { useI18n } from '../i18n/index.jsx';
-import { Avatar, AvatarStack, DueDate, EmptyState, ErrorBox, PriorityBadge, ProgressBar, Spinner, UserName } from '../components/ui.jsx';
+import { Avatar, AvatarStack, DueDate, EmptyState, ErrorBox, JobLabel, PriorityBadge, ProgressBar, Spinner, UserName } from '../components/ui.jsx';
 
 const STATUS_BAR = { new: 'bg-slate-400', in_progress: 'bg-sky-500', in_review: 'bg-amber-500', done: 'bg-emerald-500' };
 
@@ -193,7 +193,10 @@ export default function Dashboard() {
                   <Avatar userId={user.id} size="sm" />
                   <div className="min-w-0 flex-1">
                     <div className="flex justify-between text-sm">
-                      <UserName userId={user.id} />
+                      <span className="flex items-center gap-2">
+                        <UserName userId={user.id} />
+                        <JobLabel userId={user.id} />
+                      </span>
                       <span className="tabular-nums text-slate-500">
                         {open} {t('dashboard.openTasks')}
                         {late > 0 && <span className="ms-2 font-semibold text-red-600">{late} {t('dashboard.overdue')}</span>}

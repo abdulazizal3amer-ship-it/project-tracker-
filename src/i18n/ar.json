@@ -1,15 +1,13 @@
 {
   "app.name": "متتبع المشاريع",
   "app.notConfigured": "لم يُضبط الاتصال بـ Supabase. أنشئ ملف ‎.env.local‎ بقيم VITE_SUPABASE_URL و VITE_SUPABASE_ANON_KEY (انظر README).",
-
   "nav.dashboard": "اللوحة الرئيسية",
   "nav.projects": "المشاريع",
   "nav.myTasks": "مهامي",
-  "nav.users": "المستخدمون",
+  "nav.users": "الفريق",
   "nav.profile": "الملف الشخصي",
   "nav.signOut": "تسجيل الخروج",
   "nav.language": "English",
-
   "common.save": "حفظ",
   "common.cancel": "إلغاء",
   "common.close": "إغلاق",
@@ -27,7 +25,6 @@
   "common.deactivated": "معطّل",
   "common.you": "أنت",
   "common.retry": "إعادة المحاولة",
-
   "errors.required": "هذا الحقل مطلوب",
   "errors.endBeforeStart": "تاريخ النهاية لا يسبق تاريخ البداية",
   "errors.atLeastOneAssignee": "اختر عضواً واحداً على الأقل",
@@ -35,14 +32,13 @@
   "errors.passwordMismatch": "كلمتا المرور غير متطابقتين",
   "errors.invalidCredentials": "البريد أو كلمة المرور غير صحيحة",
   "errors.locked": "تم إيقاف الدخول مؤقتاً بعد 5 محاولات فاشلة. حاول بعد {minutes} دقيقة.",
-  "errors.deactivated": "هذا الحساب معطّل. تواصل مع مدير النظام.",
+  "errors.deactivated": "لا يمكن الدخول بهذا الحساب: الحساب معطّل أو ليست له صلاحية دخول.",
   "errors.email_exists": "البريد مستخدم لحساب آخر",
   "errors.invalid_email": "البريد غير صالح",
   "errors.weak_password": "كلمة المرور 8 أحرف على الأقل",
   "errors.network": "تعذّر الاتصال بالخادم ({host}). تحقق من الإنترنت، ومن قيمة SUPABASE_URL في إعدادات GitHub، وأن مانع الإعلانات لا يحجب supabase.co.",
   "errors.forbidden": "ليست لديك صلاحية لهذه العملية",
   "errors.notFound": "غير موجود أو ليست لديك صلاحية لرؤيته",
-
   "auth.signIn": "تسجيل الدخول",
   "auth.signingIn": "جارٍ الدخول…",
   "auth.email": "البريد الإلكتروني",
@@ -59,26 +55,21 @@
   "auth.passwordChanged": "تم تغيير كلمة المرور",
   "auth.resetLinkInvalid": "رابط استعادة كلمة المرور غير صالح أو منتهي. اطلب رابطاً جديداً.",
   "auth.idleSignedOut": "تم تسجيل خروجك بعد 8 ساعات من عدم النشاط.",
-
   "role.admin": "مدير النظام",
   "role.pm": "مدير مشروع",
   "role.member": "عضو فريق",
-
   "status.new": "جديدة",
   "status.in_progress": "قيد التنفيذ",
   "status.in_review": "قيد المراجعة",
   "status.done": "مكتملة",
-
   "priority.low": "منخفضة",
   "priority.medium": "متوسطة",
   "priority.high": "عالية",
   "priority.urgent": "عاجلة",
-
   "projectStatus.active": "نشط",
   "projectStatus.on_hold": "متوقف",
   "projectStatus.completed": "مكتمل",
   "projectStatus.archived": "مؤرشف",
-
   "dashboard.title": "اللوحة الرئيسية",
   "dashboard.greeting": "مرحباً، {name}",
   "dashboard.totalTasks": "إجمالي المهام",
@@ -94,7 +85,6 @@
   "dashboard.noProjects": "لا توجد مشاريع بعد.",
   "dashboard.weekList": "المستحقة هذا الأسبوع",
   "dashboard.nothingThisWeek": "لا شيء مستحق خلال الأسبوع.",
-
   "projects.title": "المشاريع",
   "projects.new": "مشروع جديد",
   "projects.edit": "تعديل المشروع",
@@ -115,11 +105,9 @@
   "projects.confirmArchive": "أرشفة المشروع تخفيه من القوائم ولا تحذف بياناته. متابعة؟",
   "projects.removeMemberConfirm": "إزالة العضو ستزيله من مسؤولي مهامه المفتوحة في هذا المشروع. متابعة؟",
   "projects.addMember": "إضافة عضو",
-
   "view.kanban": "كانبان",
   "view.list": "قائمة",
   "view.members": "الأعضاء",
-
   "tasks.new": "مهمة جديدة",
   "tasks.title": "العنوان",
   "tasks.description": "الوصف",
@@ -139,7 +127,6 @@
   "tasks.overdueBadge": "متأخرة",
   "tasks.details": "التفاصيل",
   "tasks.createdBy": "أنشأها {name}",
-
   "filters.assignee": "المسؤول",
   "filters.due": "الاستحقاق",
   "filters.overdue": "متأخرة",
@@ -147,12 +134,10 @@
   "filters.noDue": "بدون تاريخ",
   "filters.searchTitle": "ابحث بالعنوان…",
   "filters.hideDone": "إخفاء المكتملة",
-
   "comments.title": "التعليقات",
   "comments.placeholder": "اكتب تعليقاً… استخدم @ للإشارة لزميل",
   "comments.send": "إرسال",
   "comments.empty": "لا توجد تعليقات بعد.",
-
   "activity.title": "سجل النشاط",
   "activity.created": "أنشأ المهمة",
   "activity.status": "غيّر الحالة من {from} إلى {to}",
@@ -162,7 +147,6 @@
   "activity.assigned": "أسند المهمة إلى {to}",
   "activity.unassigned": "أزال {from} من المسؤولين",
   "activity.system": "النظام",
-
   "notifications.title": "الإشعارات",
   "notifications.empty": "لا توجد إشعارات.",
   "notifications.markAll": "تعليم الكل كمقروء",
@@ -172,13 +156,11 @@
   "notifications.status": "{actor} غيّر حالة مهمة: {message}",
   "notifications.due_soon": "تستحق غداً: {message}",
   "notifications.member_removed": "أُزيل عضو من المشروع: {message}",
-
   "myTasks.title": "مهامي",
   "myTasks.subtitle": "كل المهام المسندة إليك من كل المشاريع، مرتبة بالاستحقاق",
   "myTasks.group": "جماعية ({count})",
-
-  "users.title": "المستخدمون",
-  "users.new": "مستخدم جديد",
+  "users.title": "الفريق",
+  "users.new": "مستخدم نظام جديد",
   "users.fullName": "الاسم الكامل",
   "users.role": "الدور",
   "users.status": "الحالة",
@@ -190,9 +172,22 @@
   "users.activate": "تفعيل",
   "users.lastLogin": "آخر دخول",
   "users.never": "لم يدخل بعد",
-
   "profile.title": "الملف الشخصي",
   "profile.language": "اللغة المفضلة",
   "profile.changePassword": "تغيير كلمة المرور",
-  "profile.saved": "تم الحفظ"
+  "profile.saved": "تم الحفظ",
+  "job.developer": "مطوّر",
+  "job.analyst": "محلّل",
+  "job.tester": "مختبِر",
+  "team.systemUsers": "مستخدمو النظام",
+  "team.systemUsersHint": "مدير النظام ومدراء المشاريع، وهم وحدهم من يدخلون النظام.",
+  "team.members": "أعضاء الفريق",
+  "team.membersHint": "لا يدخلون النظام. تُسند إليهم المهام لمتابعة حجم عمل كل واحد.",
+  "team.newMember": "عضو فريق جديد",
+  "team.jobTitle": "نوع الوظيفة",
+  "team.emailOptional": "البريد (اختياري)",
+  "team.openTasks": "مهام مفتوحة",
+  "team.noMembers": "لا يوجد أعضاء فريق بعد.",
+  "team.byJob": "حجم العمل حسب الوظيفة",
+  "team.people": "{count} شخص"
 }
