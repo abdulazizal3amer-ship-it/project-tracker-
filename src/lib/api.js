@@ -3,7 +3,7 @@
 import { fetchAll, supabase } from './supabase.js';
 
 const TASK_COLUMNS =
-  'id, project_id, title, description, status, priority, due_date, created_by, created_at, completed_at, completed_by';
+  'id, project_id, title, description, status, priority, due_date, created_by, created_at, completed_at, completed_by, start_date, work_days';
 
 function check({ data, error }) {
   if (error) throw error;
@@ -116,7 +116,7 @@ export async function getTask(id) {
   return check(await supabase.from('tasks').select(TASK_COLUMNS).eq('id', id).maybeSingle());
 }
 
-export async function createTask({ project_id, title, description, priority, due_date, assignees }) {
+export async function createTask({ project_id, title, description, priority, due_date, start_date, work_days, assignees }) {
   return check(
     await supabase.rpc('create_task', {
       p_project: project_id,
@@ -125,6 +125,8 @@ export async function createTask({ project_id, title, description, priority, due
       p_priority: priority,
       p_due_date: due_date || null,
       p_assignees: assignees,
+      p_start_date: start_date || null,
+      p_work_days: work_days === '' || work_days == null ? null : Number(work_days),
     }),
   );
 }

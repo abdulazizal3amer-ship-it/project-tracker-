@@ -214,5 +214,13 @@
   "reports.none": "لا يوجد.",
   "reports.includeArchived": "إظهار المؤرشفة",
   "reports.printHint": "لحفظ التقرير PDF اختر «حفظ كـ PDF» من نافذة الطباعة.",
-  "reports.openReport": "تقرير"
+  "reports.openReport": "تقرير",
+  "tasks.startDate": "تاريخ البداية",
+  "tasks.workDays": "أيام العمل",
+  "tasks.scheduleHint": "يُحسب تاريخ الانتهاء تلقائياً بأيام العمل؛ الجمعة والسبت إجازة.",
+  "tasks.scheduleEmpty": "أدخل تاريخ البداية وعدد أيام العمل ليُحسب تاريخ الانتهاء تلقائياً (الجمعة والسبت إجازة)، أو حدّد تاريخ الاستحقاق يدوياً.",
+  "tasks.startsOnWeekend": "تاريخ البداية يوم إجازة؛ يبدأ العدّ من الأحد التالي.",
+  "tasks.scheduleSummary": "تبدأ {start} · {days} يوم عمل",
+  "errors.workDaysInvalid": "عدد أيام العمل رقم صحيح من 1 إلى 365",
+  "errors.startDateRequired": "حدّد تاريخ البداية مع عدد أيام العمل"
 }

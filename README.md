@@ -41,6 +41,7 @@ supabase/
   migrations/002_rls.sql      سياسات الصلاحيات على مستوى الصفوف
   migrations/003_cron.sql     إشعار "تستحق غداً" يومياً (pg_cron)
   migrations/004_team_members.sql  أعضاء الفريق بدون دخول (مطوّر/محلّل/مختبِر)
+  migrations/005_task_schedule.sql تاريخ بداية المهمة وأيام العمل (الجمعة والسبت إجازة)
   seed.sql                    ترقية أول حساب إلى مدير نظام
   functions/create-user/      Edge Function لإنشاء الحسابات (تحمل مفتاح الخدمة)
 tests/
@@ -66,6 +67,7 @@ tests/
    - `supabase/migrations/002_rls.sql`
    - `supabase/migrations/003_cron.sql`: فعّل أولاً امتداد **pg_cron** من Database → Extensions.
    - `supabase/migrations/004_team_members.sql`
+   - `supabase/migrations/005_task_schedule.sql`
 3. من **Authentication → Sign In / Providers**:
    - أوقف **Allow new users to sign up**، فالحسابات ينشئها المدير فقط.
    - اضبط الحد الأدنى لطول كلمة المرور على 8.

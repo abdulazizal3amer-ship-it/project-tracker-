@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import * as api from '../lib/api.js';
 import { useAuth } from '../lib/auth.jsx';
-import { allowedAssignees, canManageProject, canMoveTask, PRIORITIES, TASK_STATUSES, validateTask } from '../lib/logic.js';
+import { addWorkDays, allowedAssignees, canManageProject, canMoveTask, isWeekend, PRIORITIES, TASK_STATUSES, validateTask } from '../lib/logic.js';
 import { useUsers } from '../lib/users.jsx';
 import { useI18n } from '../i18n/index.jsx';
 import AssigneePicker from './AssigneePicker.jsx';
@@ -9,8 +9,11 @@ import { CommentBody, MentionInput } from './MentionInput.jsx';
 import { Avatar, DueDate, ErrorBox, Field, Modal, Spinner, StatusBadge, UserName } from './ui.jsx';
 
 function TaskFields({ form, setForm, errors, assigneeOptions, onlySelf, disabled }) {
-  const { t } = useI18n();
+  const { t, formatDate } = useI18n();
   const set = (key) => (e) => setForm((f) => ({ ...f, [key]: e.target.value }));
+  // Start date + working days → end date (Friday/Saturday off). The
+  // database recalculates it the same way on save.
+  const scheduledEnd = addWorkDays(form.start_date, form.work_days);
   return (
     <div className="space-y-4">
       <Field label={t('tasks.title')} error={errors.title} htmlFor="task-title">
@@ -29,9 +32,38 @@ function TaskFields({ form, setForm, errors, assigneeOptions, onlySelf, disabled
             ))}
           </select>
         </Field>
-        <Field label={t('tasks.due')} htmlFor="task-due">
-          <input id="task-due" type="date" className="input" value={form.due_date} onChange={set('due_date')} disabled={disabled} />
+      </div>
+      <div className="grid gap-4 rounded-lg bg-slate-50 p-3 sm:grid-cols-3">
+        <Field label={t('tasks.startDate')} htmlFor="task-start">
+          <input id="task-start" type="date" className="input" value={form.start_date} onChange={set('start_date')} disabled={disabled} />
         </Field>
+        <Field label={t('tasks.workDays')} error={errors.work_days} htmlFor="task-days">
+          <input
+            id="task-days"
+            type="number"
+            inputMode="numeric"
+            min={1}
+            max={365}
+            step={1}
+            className="input"
+            value={form.work_days}
+            onChange={set('work_days')}
+            disabled={disabled}
+          />
+        </Field>
+        <Field label={t('tasks.due')} htmlFor="task-due">
+          {scheduledEnd ? (
+            <div id="task-due" className="input bg-white font-medium text-brand-800">
+              {formatDate(scheduledEnd)}
+            </div>
+          ) : (
+            <input id="task-due" type="date" className="input" value={form.due_date} onChange={set('due_date')} disabled={disabled} />
+          )}
+        </Field>
+        <p className="text-xs text-slate-500 sm:col-span-3">
+          {scheduledEnd ? t('tasks.scheduleHint') : t('tasks.scheduleEmpty')}
+          {form.start_date && isWeekend(form.start_date) && <span className="ms-1 text-amber-700">{t('tasks.startsOnWeekend')}</span>}
+        </p>
       </div>
       <Field label={t('tasks.assignees')} error={errors.assignees}>
         {onlySelf && <p className="mb-1 text-xs text-slate-500">{t('tasks.onlySelf')}</p>}
@@ -52,7 +84,15 @@ export function NewTaskModal({ open, onClose, project, memberIds, onCreated, ini
   const { profile } = useAuth();
   const options = allowedAssignees(profile, project, memberIds);
   const manager = canManageProject(profile, project, memberIds);
-  const blank = () => ({ title: '', description: '', priority: 'medium', due_date: '', assignees: manager ? [] : [profile.id] });
+  const blank = () => ({
+    title: '',
+    description: '',
+    priority: 'medium',
+    start_date: '',
+    work_days: '',
+    due_date: '',
+    assignees: manager ? [] : [profile.id],
+  });
   const [form, setForm] = useState(blank);
   const [errors, setErrors] = useState({});
   const [saving, setSaving] = useState(false);
@@ -126,7 +166,7 @@ function ActivityItem({ entry }) {
 // Task details: status for assignees, full edit for managers, comments and
 // activity for everyone in the project (FR-10, FR-19, FR-21).
 export function TaskDetailModal({ taskId, project, memberIds, onClose, onChanged }) {
-  const { t, formatDateTime } = useI18n();
+  const { t, formatDate, formatDateTime } = useI18n();
   const { profile } = useAuth();
   const { nameOf } = useUsers();
   const [task, setTask] = useState(null);
@@ -162,6 +202,8 @@ export function TaskDetailModal({ taskId, project, memberIds, onClose, onChanged
         description: tk.description ?? '',
         priority: tk.priority,
         due_date: tk.due_date ?? '',
+        start_date: tk.start_date ?? '',
+        work_days: tk.work_days ?? '',
         assignees: as,
       });
     } catch (err) {
@@ -206,6 +248,8 @@ export function TaskDetailModal({ taskId, project, memberIds, onClose, onChanged
         description: form.description.trim() || null,
         priority: form.priority,
         due_date: form.due_date || null,
+        start_date: form.start_date || null,
+        work_days: form.work_days === '' ? null : Number(form.work_days),
       });
       const same = form.assignees.length === assignees.length && form.assignees.every((id) => assignees.includes(id));
       if (!same) await api.setTaskAssignees(task.id, form.assignees);
@@ -341,6 +385,11 @@ export function TaskDetailModal({ taskId, project, memberIds, onClose, onChanged
             <div>
               <div className="label">{t('tasks.due')}</div>
               <DueDate task={task} />
+              {task.start_date && (
+                <div className="mt-1 text-xs text-slate-500">
+                  {t('tasks.scheduleSummary', { start: formatDate(task.start_date), days: task.work_days ?? '—' })}
+                </div>
+              )}
             </div>
             <div>
               <div className="label">{t('tasks.project')}</div>

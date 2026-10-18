@@ -148,10 +148,15 @@ export function validateProject({ name, start_date, end_date }) {
   return errors;
 }
 
-export function validateTask({ title, assignees }) {
+export function validateTask({ title, assignees, start_date, work_days }) {
   const errors = {};
   if (!title || !title.trim()) errors.title = 'required';
   if (!assignees || assignees.length === 0) errors.assignees = 'atLeastOneAssignee';
+  if (work_days !== undefined && work_days !== null && work_days !== '') {
+    const n = Number(work_days);
+    if (!Number.isInteger(n) || n < 1 || n > 365) errors.work_days = 'workDaysInvalid';
+    else if (!start_date) errors.work_days = 'startDateRequired';
+  }
   return errors;
 }
 
@@ -285,4 +290,29 @@ export function toCsv(rows) {
     return /[",\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
   };
   return '﻿' + rows.map((r) => r.map(cell).join(',')).join('\r\n');
+}
+
+// ---------------------------------------------------------------------
+// Task schedule — weekend is Friday and Saturday. Mirrors
+// public.add_work_days() in 005_task_schedule.sql, which is the source of
+// truth; this copy previews the end date while the form is filled in.
+// ---------------------------------------------------------------------
+export function isWeekend(iso) {
+  const [y, m, d] = iso.split('-').map(Number);
+  const day = new Date(Date.UTC(y, m - 1, d)).getUTCDay(); // 0 = Sunday … 5 = Friday, 6 = Saturday
+  return day === 5 || day === 6;
+}
+
+export function addWorkDays(startISO, days) {
+  const n = Number(days);
+  if (!startISO || !Number.isInteger(n) || n < 1) return null;
+  let date = startISO;
+  let counted = 0;
+  for (;;) {
+    if (!isWeekend(date)) {
+      counted += 1;
+      if (counted === n) return date;
+    }
+    date = addDays(date, 1);
+  }
 }

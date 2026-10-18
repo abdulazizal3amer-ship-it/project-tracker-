@@ -9,6 +9,7 @@ import {
   filterTasks,
   groupAssignees,
   isOverdue,
+  JOB_TITLES,
   PRIORITIES,
   projectProgress,
   sortTasks,
@@ -225,10 +226,11 @@ export function TaskTable({ tasks, assigneeMap, onOpen, projectName }) {
 function Members({ project, memberIds, onChanged }) {
   const { t } = useI18n();
   const { profile } = useAuth();
-  const { users, byId } = useUsers();
+  const { users, byId, refresh } = useUsers();
   const manager = canManageProject(profile, project, memberIds);
   const [adding, setAdding] = useState('');
   const [error, setError] = useState(null);
+  const [newMember, setNewMember] = useState(null); // { full_name, job_title } while the quick form is open
   const candidates = users.filter((u) => u.is_active && !memberIds.includes(u.id));
 
   const run = async (fn) => {
@@ -244,13 +246,16 @@ function Members({ project, memberIds, onChanged }) {
   return (
     <div className="space-y-4">
       <ErrorBox error={error} />
-      {manager && project.status !== 'archived' && candidates.length > 0 && (
-        <div className="flex gap-2">
+      {manager && project.status !== 'archived' && (
+        <div className="flex flex-wrap gap-2">
+          {candidates.length > 0 && (
+            <>
           <select className="input max-w-xs" value={adding} onChange={(e) => setAdding(e.target.value)}>
             <option value="">{t('projects.addMember')}…</option>
             {candidates.map((u) => (
               <option key={u.id} value={u.id}>
                 {u.full_name}
+                {u.job_title ? ` — ${t(`job.${u.job_title}`)}` : ''}
               </option>
             ))}
           </select>
@@ -264,7 +269,56 @@ function Members({ project, memberIds, onChanged }) {
           >
             {t('common.add')}
           </button>
+            </>
+          )}
+          {!newMember && (
+            <button className="btn-secondary" onClick={() => setNewMember({ full_name: '', job_title: 'developer' })}>
+              + {t('team.newMember')}
+            </button>
+          )}
         </div>
+      )}
+      {/* Create a team member (no login) and add them to this project in one step. */}
+      {newMember && (
+        <form
+          className="card flex flex-wrap items-end gap-3 p-3"
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (!newMember.full_name.trim()) return;
+            run(async () => {
+              const person = await api.createTeamMember(newMember);
+              await api.addProjectMembers(project.id, [person.id]);
+              await refresh();
+              setNewMember(null);
+            });
+          }}
+        >
+          <label className="min-w-48 flex-1">
+            <span className="label">{t('users.fullName')}</span>
+            <input
+              className="input"
+              autoFocus
+              value={newMember.full_name}
+              onChange={(e) => setNewMember((m) => ({ ...m, full_name: e.target.value }))}
+            />
+          </label>
+          <label>
+            <span className="label">{t('team.jobTitle')}</span>
+            <select className="input" value={newMember.job_title} onChange={(e) => setNewMember((m) => ({ ...m, job_title: e.target.value }))}>
+              {JOB_TITLES.map((j) => (
+                <option key={j} value={j}>
+                  {t(`job.${j}`)}
+                </option>
+              ))}
+            </select>
+          </label>
+          <button className="btn-primary" disabled={!newMember.full_name.trim()}>
+            {t('common.add')}
+          </button>
+          <button type="button" className="btn-ghost" onClick={() => setNewMember(null)}>
+            {t('common.cancel')}
+          </button>
+        </form>
       )}
       <ul className="card divide-y divide-slate-100">
         {memberIds.map((id) => (

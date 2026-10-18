@@ -245,4 +245,30 @@ update public.projects set status = 'active';
 update public.tasks set due_date = current_date + 1 where id = (select id from ids where name = 'open');
 select test.ok(public.notify_due_soon() = 0, 'no due-soon notifications stored for team members');
 
+-- ---------------------------------------------------------------------
+-- Task schedule: start date + working days (Friday/Saturday off)
+-- ---------------------------------------------------------------------
+select test.ok(public.add_work_days('2026-10-18', 5) = '2026-10-22', 'Sun + 5 working days ends Thursday');
+select test.ok(public.add_work_days('2026-10-22', 2) = '2026-10-25', 'Thu + 2 working days skips Fri/Sat');
+select test.ok(public.add_work_days('2026-10-23', 1) = '2026-10-25', 'start on Friday begins on Sunday');
+select test.ok(public.add_work_days('2026-10-18', 10) = '2026-10-29', 'two working weeks');
+select test.ok(public.add_work_days('2026-10-18', null) is null, 'no work days, no calculation');
+
+select test.as_user(:PM1);
+update public.projects set status = 'active' where id = :P1;
+insert into public.project_members (project_id, user_id) values (:P1, :M2) on conflict do nothing;
+insert into ids values ('sched', public.create_task(:P1, 'Scheduled', null, 'medium', null, array[:M1]::uuid[], '2026-10-18', 5));
+reset role;
+select test.ok((select due_date from public.tasks where id = (select id from ids where name = 'sched')) = '2026-10-22',
+               'create_task computes the due date from start + working days');
+select test.as_user(:PM1);
+update public.tasks set work_days = 7 where id = (select id from ids where name = 'sched');
+update public.tasks set due_date = '2030-01-01' where id = (select id from ids where name = 'sched');
+reset role;
+select test.ok((select due_date from public.tasks where id = (select id from ids where name = 'sched')) = '2026-10-26',
+               'due date follows the schedule when work days change, and cannot drift from it');
+select test.ok(exists (select 1 from public.activity_log where task_id = (select id from ids where name = 'sched')
+                       and action = 'due_date' and new_value = '2026-10-26'), 'schedule change logged');
+select test.throws($$update public.tasks set work_days = 0 where id = (select id from ids where name = 'sched')$$, 'work days must be at least 1');
+
 \echo 'all RLS tests passed'

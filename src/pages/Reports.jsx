@@ -151,6 +151,8 @@ function ProjectReport({ report, pageBreak }) {
                 <th className={th}>{t('tasks.assignees')}</th>
                 <th className={th}>{t('tasks.status')}</th>
                 <th className={th}>{t('tasks.priority')}</th>
+                <th className={th}>{t('tasks.startDate')}</th>
+                <th className={th}>{t('tasks.workDays')}</th>
                 <th className={th}>{t('tasks.due')}</th>
               </tr>
             </thead>
@@ -165,6 +167,8 @@ function ProjectReport({ report, pageBreak }) {
                   <td className={td}>
                     <PriorityBadge priority={task.priority} />
                   </td>
+                  <td className={td}>{task.start_date ? formatDate(task.start_date) : '—'}</td>
+                  <td className={`${td} tabular-nums`}>{task.work_days ?? '—'}</td>
                   <td className={td}>
                     <DueDate task={task} />
                   </td>
@@ -268,7 +272,7 @@ export default function Reports() {
   const toggle = (id) => setSelected(selected.includes(id) ? selected.filter((x) => x !== id) : [...selected, id]);
 
   const exportCsv = () => {
-    const rows = [[t('tasks.project'), t('tasks.title'), t('tasks.assignees'), t('tasks.status'), t('tasks.priority'), t('tasks.due'), t('reports.daysLate')]];
+    const rows = [[t('tasks.project'), t('tasks.title'), t('tasks.assignees'), t('tasks.status'), t('tasks.priority'), t('tasks.startDate'), t('tasks.workDays'), t('tasks.due'), t('reports.daysLate')]];
     for (const r of reports) {
       const late = Object.fromEntries(r.overdue.map((o) => [o.id, o.daysLate]));
       for (const task of r.tasks) {
@@ -278,6 +282,8 @@ export default function Reports() {
           (r.assigneeMap[task.id] ?? []).map(nameOf).join('، '),
           t(`status.${task.status}`),
           t(`priority.${task.priority}`),
+          task.start_date ?? '',
+          task.work_days ?? '',
           task.due_date ?? '',
           late[task.id] ?? '',
         ]);

@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest';
 import {
   activeMentionQuery,
   addDays,
+  addWorkDays,
+  isWeekend,
   allowedAssignees,
   canCreateProject,
   canManageProject,
@@ -177,6 +179,11 @@ describe('validation', () => {
   it('requires a title and at least one assignee (US-02)', () => {
     expect(validateTask({ title: '', assignees: [] })).toEqual({ title: 'required', assignees: 'atLeastOneAssignee' });
     expect(validateTask({ title: 'T', assignees: [U1] })).toEqual({});
+    expect(validateTask({ title: 'T', assignees: [U1], start_date: '2026-10-18', work_days: '5' })).toEqual({});
+    expect(validateTask({ title: 'T', assignees: [U1], start_date: '', work_days: '5' })).toEqual({ work_days: 'startDateRequired' });
+    expect(validateTask({ title: 'T', assignees: [U1], start_date: '2026-10-18', work_days: '0' })).toEqual({ work_days: 'workDaysInvalid' });
+    expect(validateTask({ title: 'T', assignees: [U1], start_date: '2026-10-18', work_days: '2.5' })).toEqual({ work_days: 'workDaysInvalid' });
+    expect(validateTask({ title: 'T', assignees: [U1], start_date: '2026-10-18', work_days: '' })).toEqual({});
   });
   it('enforces password rules (NFR-04)', () => {
     expect(validatePassword('short')).toBe('passwordTooShort');
@@ -248,5 +255,29 @@ describe('@mentions (FR-19)', () => {
     expect(initials('Abdulaziz Al Amer')).toBe('AA');
     expect(initials('سارة')).toBe('س');
     expect(initials('')).toBe('?');
+  });
+});
+
+describe('task schedule (Friday/Saturday weekend)', () => {
+  it('detects the weekend', () => {
+    expect(isWeekend('2026-10-23')).toBe(true); // Friday
+    expect(isWeekend('2026-10-24')).toBe(true); // Saturday
+    expect(isWeekend('2026-10-25')).toBe(false); // Sunday
+    expect(isWeekend('2026-10-22')).toBe(false); // Thursday
+  });
+  it('matches the database calculation', () => {
+    expect(addWorkDays('2026-10-18', 5)).toBe('2026-10-22');
+    expect(addWorkDays('2026-10-22', 2)).toBe('2026-10-25');
+    expect(addWorkDays('2026-10-23', 1)).toBe('2026-10-25');
+    expect(addWorkDays('2026-10-18', 7)).toBe('2026-10-26');
+    expect(addWorkDays('2026-10-18', 10)).toBe('2026-10-29');
+    expect(addWorkDays('2026-12-30', 3)).toBe('2027-01-03');
+  });
+  it('accepts numeric strings from form inputs and rejects bad input', () => {
+    expect(addWorkDays('2026-10-18', '5')).toBe('2026-10-22');
+    expect(addWorkDays('2026-10-18', '')).toBeNull();
+    expect(addWorkDays('2026-10-18', 0)).toBeNull();
+    expect(addWorkDays('2026-10-18', 1.5)).toBeNull();
+    expect(addWorkDays('', 5)).toBeNull();
   });
 });
