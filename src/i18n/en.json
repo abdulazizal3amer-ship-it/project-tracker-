@@ -39,6 +39,7 @@
   "errors.email_exists": "This email is already used by another account",
   "errors.invalid_email": "Invalid email address",
   "errors.weak_password": "Password must be at least 8 characters",
+  "errors.network": "Can't reach the server ({host}). Check your connection, the SUPABASE_URL secret in GitHub, and that no ad blocker is blocking supabase.co.",
   "errors.forbidden": "You don't have permission to do that",
   "errors.notFound": "Not found, or you don't have access",
 

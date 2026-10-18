@@ -1,7 +1,18 @@
 import { createClient } from '@supabase/supabase-js';
 
-const url = import.meta.env.VITE_SUPABASE_URL;
-const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+// Values come from GitHub secrets, where stray spaces, newlines or a
+// missing scheme are easy to paste in; normalise them here.
+function normaliseUrl(raw) {
+  let value = (raw ?? '').trim().replace(/\/+$/, '');
+  if (value && !/^https?:\/\//i.test(value)) value = `https://${value}`;
+  return value;
+}
+
+const url = normaliseUrl(import.meta.env.VITE_SUPABASE_URL);
+const anonKey = (import.meta.env.VITE_SUPABASE_ANON_KEY ?? '').trim();
+
+// Shown on the sign-in screen when the server cannot be reached at all.
+export const supabaseHost = url.replace(/^https?:\/\//i, '');
 
 export const isConfigured = Boolean(url && anonKey);
 

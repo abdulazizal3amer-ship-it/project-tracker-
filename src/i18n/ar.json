@@ -39,6 +39,7 @@
   "errors.email_exists": "البريد مستخدم لحساب آخر",
   "errors.invalid_email": "البريد غير صالح",
   "errors.weak_password": "كلمة المرور 8 أحرف على الأقل",
+  "errors.network": "تعذّر الاتصال بالخادم ({host}). تحقق من الإنترنت، ومن قيمة SUPABASE_URL في إعدادات GitHub، وأن مانع الإعلانات لا يحجب supabase.co.",
   "errors.forbidden": "ليست لديك صلاحية لهذه العملية",
   "errors.notFound": "غير موجود أو ليست لديك صلاحية لرؤيته",
 

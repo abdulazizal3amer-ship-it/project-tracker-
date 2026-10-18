@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { supabase } from '../lib/supabase.js';
+import { supabase, supabaseHost } from '../lib/supabase.js';
 import { useAuth } from '../lib/auth.jsx';
 import { validatePassword } from '../lib/logic.js';
 import { useI18n } from '../i18n/index.jsx';
@@ -64,7 +64,9 @@ export function LoginPage() {
         setInfo(t('auth.resetSent'));
       }
     } catch (err) {
-      setError(err.code?.startsWith?.('errors.') ? t(err.code, err.vars) : err.message);
+      if (err.code?.startsWith?.('errors.')) setError(t(err.code, err.vars));
+      else if (/failed to fetch|networkerror|load failed/i.test(err.message)) setError(t('errors.network', { host: supabaseHost }));
+      else setError(err.message);
     } finally {
       setBusy(false);
     }
