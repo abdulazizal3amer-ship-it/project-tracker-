@@ -76,7 +76,7 @@ const STATUS_STYLES = {
 
 export function StatusBadge({ status }) {
   const { t } = useI18n();
-  return <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_STYLES[status]}`}>{t(`status.${status}`)}</span>;
+  return <span className={`whitespace-nowrap rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_STYLES[status]}`}>{t(`status.${status}`)}</span>;
 }
 
 const PRIORITY_STYLES = {

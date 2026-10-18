@@ -127,7 +127,10 @@ function ProjectReport({ report, pageBreak }) {
             <tbody>
               {report.overdue.map((task) => (
                 <tr key={task.id}>
-                  <td className={td}>{task.title}</td>
+                  <td className={td}>
+                    <div className="font-medium">{task.title}</div>
+                    {task.description && <div className="mt-0.5 whitespace-pre-wrap text-xs text-slate-500">{task.description}</div>}
+                  </td>
                   <td className={td}>{(report.assigneeMap[task.id] ?? []).map(nameOf).join('، ')}</td>
                   <td className={td}>{formatDate(task.due_date)}</td>
                   <td className={`${td} font-semibold tabular-nums text-red-600`}>{task.daysLate}</td>
@@ -159,7 +162,10 @@ function ProjectReport({ report, pageBreak }) {
             <tbody>
               {report.tasks.map((task) => (
                 <tr key={task.id} className="break-inside-avoid">
-                  <td className={td}>{task.title}</td>
+                  <td className={td}>
+                    <div className="font-medium">{task.title}</div>
+                    {task.description && <div className="mt-0.5 whitespace-pre-wrap text-xs text-slate-500">{task.description}</div>}
+                  </td>
                   <td className={td}>{(report.assigneeMap[task.id] ?? []).map(nameOf).join('، ')}</td>
                   <td className={td}>
                     <StatusBadge status={task.status} />
@@ -272,13 +278,14 @@ export default function Reports() {
   const toggle = (id) => setSelected(selected.includes(id) ? selected.filter((x) => x !== id) : [...selected, id]);
 
   const exportCsv = () => {
-    const rows = [[t('tasks.project'), t('tasks.title'), t('tasks.assignees'), t('tasks.status'), t('tasks.priority'), t('tasks.startDate'), t('tasks.workDays'), t('tasks.due'), t('reports.daysLate')]];
+    const rows = [[t('tasks.project'), t('tasks.title'), t('tasks.description'), t('tasks.assignees'), t('tasks.status'), t('tasks.priority'), t('tasks.startDate'), t('tasks.workDays'), t('tasks.due'), t('reports.daysLate')]];
     for (const r of reports) {
       const late = Object.fromEntries(r.overdue.map((o) => [o.id, o.daysLate]));
       for (const task of r.tasks) {
         rows.push([
           r.project.name,
           task.title,
+          task.description ?? '',
           (r.assigneeMap[task.id] ?? []).map(nameOf).join('، '),
           t(`status.${task.status}`),
           t(`priority.${task.priority}`),
