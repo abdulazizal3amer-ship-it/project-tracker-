@@ -14,6 +14,7 @@ export default function Layout() {
     { to: '/', label: t('nav.dashboard'), end: true },
     { to: '/projects', label: t('nav.projects') },
     { to: '/my-tasks', label: t('nav.myTasks') },
+    { to: '/reports', label: t('nav.reports') },
     { to: '/users', label: t('nav.users') },
   ];
 
@@ -28,7 +29,7 @@ export default function Layout() {
 
   return (
     <div className="min-h-screen">
-      <header className="sticky top-0 z-20 border-b border-slate-200 bg-white/95 backdrop-blur">
+      <header className="sticky top-0 z-20 print:hidden border-b border-slate-200 bg-white/95 backdrop-blur">
         <div className="mx-auto flex h-14 max-w-7xl items-center gap-3 px-4">
           <button className="btn-ghost md:hidden" onClick={() => setMenuOpen((o) => !o)} aria-label="menu">
             ☰
@@ -70,7 +71,7 @@ export default function Layout() {
           </nav>
         )}
       </header>
-      <main className="mx-auto max-w-7xl px-4 py-6">
+      <main className="mx-auto max-w-7xl px-4 py-6 print:max-w-none print:p-0">
         <Outlet />
       </main>
     </div>

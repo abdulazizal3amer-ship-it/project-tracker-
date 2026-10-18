@@ -234,3 +234,55 @@ export function initials(name = '') {
   if (!parts.length) return '?';
   return (parts[0][0] + (parts.length > 1 ? parts[parts.length - 1][0] : '')).toUpperCase();
 }
+
+// ---------------------------------------------------------------------
+// Reports (FR-26) — one project, or a summary over several.
+// ---------------------------------------------------------------------
+export function buildProjectReport(project, tasks, assignees, today = todayISO()) {
+  const own = tasks.filter((t) => t.project_id === project.id);
+  const ids = new Set(own.map((t) => t.id));
+  const ownAssignees = assignees.filter((a) => ids.has(a.task_id));
+  const assigneeMap = groupAssignees(ownAssignees);
+
+  const byMember = {};
+  for (const a of ownAssignees) {
+    const task = own.find((t) => t.id === a.task_id);
+    const row = (byMember[a.user_id] ??= { userId: a.user_id, total: 0, done: 0, open: 0, overdue: 0 });
+    row.total += 1;
+    if (task.status === 'done') row.done += 1;
+    else row.open += 1;
+    if (isOverdue(task, today)) row.overdue += 1;
+  }
+
+  return {
+    project,
+    total: own.length,
+    progress: projectProgress(own),
+    counts: countByStatus(own),
+    overdue: overdueTasks(own, today).map((t) => ({ ...t, daysLate: daysOverdue(t, today) })),
+    byMember: Object.values(byMember).sort((a, b) => b.open - a.open || b.total - a.total),
+    tasks: sortTasks(own, 'due_date'),
+    assigneeMap,
+  };
+}
+
+export function summarizeReports(reports) {
+  const counts = Object.fromEntries(TASK_STATUSES.map((s) => [s, 0]));
+  let total = 0;
+  let overdue = 0;
+  for (const r of reports) {
+    total += r.total;
+    overdue += r.overdue.length;
+    for (const s of TASK_STATUSES) counts[s] += r.counts[s];
+  }
+  return { projects: reports.length, total, overdue, counts, progress: total ? Math.round((counts.done / total) * 100) : 0 };
+}
+
+// CSV for Excel: quoted cells and a BOM so Arabic opens correctly.
+export function toCsv(rows) {
+  const cell = (v) => {
+    const s = v === null || v === undefined ? '' : String(v);
+    return /[",\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+  };
+  return '﻿' + rows.map((r) => r.map(cell).join(',')).join('\r\n');
+}

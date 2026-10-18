@@ -13,6 +13,7 @@ import MyTasks from './pages/MyTasks.jsx';
 import Users from './pages/Users.jsx';
 import Profile from './pages/Profile.jsx';
 import TaskRedirect from './pages/TaskRedirect.jsx';
+import Reports from './pages/Reports.jsx';
 
 function NotConfigured() {
   const { t } = useI18n();
@@ -55,6 +56,7 @@ function Gate() {
             <Route path="my-tasks" element={<MyTasks />} />
             <Route path="profile" element={<Profile />} />
             <Route path="users" element={<Users />} />
+            <Route path="reports" element={<Reports />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
         </Routes>

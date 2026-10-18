@@ -399,6 +399,9 @@ export default function ProjectView() {
                 + {t('tasks.new')}
               </button>
             )}
+            <Link to={`/reports?ids=${project.id}`} className="btn-secondary">
+              {t('reports.openReport')}
+            </Link>
             {manager && (
               <button className="btn-secondary" onClick={() => setEditing(true)}>
                 {t('common.edit')}

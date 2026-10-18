@@ -54,3 +54,10 @@
 @utility field-error {
   @apply mt-1 text-xs text-red-600;
 }
+
+/* Printable reports: white page, keep colours, A4 margins. */
+@media print {
+  @page { size: A4; margin: 14mm; }
+  body { background: white; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
