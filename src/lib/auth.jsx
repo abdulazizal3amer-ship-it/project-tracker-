@@ -55,6 +55,20 @@ export function AuthProvider({ children }) {
       if (event === 'PASSWORD_RECOVERY') setRecovery(true);
       setSession(s);
     });
+
+    // Password-reset emails link back to the app with ?token_hash=…&type=recovery
+    // (see README), so the token is verified through the app's own API URL
+    // rather than a supabase.co link that some networks block.
+    const params = new URLSearchParams(window.location.search);
+    const tokenHash = params.get('token_hash');
+    if (tokenHash && params.get('type') === 'recovery') {
+      window.history.replaceState(null, '', window.location.pathname + window.location.hash);
+      supabase.auth.verifyOtp({ token_hash: tokenHash, type: 'recovery' }).then(({ error }) => {
+        if (error) setNotice('auth.resetLinkInvalid');
+        else setRecovery(true);
+      });
+    }
+
     return () => sub.subscription.unsubscribe();
   }, []);
 

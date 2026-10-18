@@ -87,6 +87,22 @@ tests/
 4. للنسخ الاحتياطي الأسبوعي (`backup.yml`): أنشئ مستودعاً **خاصاً** للنسخ، وأضف الأسرار `SUPABASE_DB_URL` و`BACKUP_REPO` و`BACKUP_TOKEN`. التفاصيل داخل الملف. المهمة نفسها "تلمس" القاعدة كل 3 أيام حتى لا يتوقف المشروع المجاني.
 5. ممارسات موصى بها: حماية فرع `main` مع مراجعة لكل Pull Request، وتفعيل **Secret scanning** و**Push protection**.
 
+### إذا كانت الشبكة تحجب `supabase.co`
+
+بعض الشبكات ومزودي الإنترنت يحجبون نطاق `*.supabase.co`، فيظهر في المتصفح `DNS_PROBE_FINISHED_NO_INTERNET` أو "تعذّر الاتصال بالخادم". الحل وسيط مجاني على Cloudflare Workers، والتطبيق يتصل عن طريقه:
+
+1. أنشئ حساباً مجانياً في [Cloudflare](https://dash.cloudflare.com/sign-up)، ثم **Workers & Pages ← Create ← Create Worker** (قالب Hello World) ← **Deploy**.
+2. اضغط **Edit code**، والصق محتوى [`cloudflare/supabase-proxy.js`](cloudflare/supabase-proxy.js) بدل الكود الافتراضي، ثم **Deploy**. غيّر `SUPABASE_URL` في أول الملف إذا كان مشروعك مختلفاً.
+3. انسخ رابط الـ Worker، مثل `https://supabase-proxy.<حسابك>.workers.dev`، وافتح `<الرابط>/auth/v1/health`. لازم يظهر رد JSON.
+4. في GitHub غيّر قيمة السر `SUPABASE_URL` إلى رابط الـ Worker، وأعد تشغيل **Deploy to GitHub Pages**.
+5. **رسالة استعادة كلمة المرور:** رابطها الافتراضي يمر على `supabase.co`. من Supabase ← **Authentication ← Emails ← Reset Password** استبدل `{{ .ConfirmationURL }}` بـ:
+   ```
+   {{ .SiteURL }}?token_hash={{ .TokenHash }}&type=recovery
+   ```
+   بهذا يفتح الرابط التطبيقَ مباشرة، ويتحقق التطبيق من الرمز عبر الوسيط.
+
+لوحة Supabase (`supabase.com`) ووظيفة `create-user` لا تتأثران، لأنهما تعملان من جهة الخادم.
+
 ### 3) التطوير المحلي
 
 ```bash
@@ -111,7 +127,7 @@ npm run test:sql         # الصلاحيات (RLS) والمشغّلات على 
 
 - **القفل بعد 5 محاولات** يعمل على مستوى التطبيق (دوال `login_lock_status` و`register_login_failure`)، وتضاف إليه حدود المعدل المدمجة في Supabase Auth. يمكن لأي شخص يعرف بريداً أن يقفله مؤقتاً لـ15 دقيقة. هذه مقايضة مقبولة لفريق داخلي.
 - **الخروج بعد 8 ساعات خمول** يُطبَّق في المتصفح. ويمكن أيضاً ضبط *Time-box / Inactivity timeout* للجلسات من إعدادات Supabase في الخطط المدفوعة.
-- **رابط استعادة كلمة المرور** يجب فتحه في المتصفح نفسه الذي طُلب منه، لأن التطبيق يستخدم تدفق PKCE.
+- **رابط استعادة كلمة المرور** بالقالب الافتراضي يجب فتحه في المتصفح نفسه الذي طُلب منه (تدفق PKCE). القالب المعدّل في قسم "الشبكة تحجب supabase.co" يعمل من أي متصفح.
 - يستخدم التطبيق `HashRouter` (روابط مثل `#/projects`) لأن GitHub Pages لا يدعم التوجيه من جهة الخادم.
 
 ## الترخيص

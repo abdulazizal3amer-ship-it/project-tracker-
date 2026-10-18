@@ -57,6 +57,7 @@
   "auth.forcedTitle": "Change your temporary password",
   "auth.forcedHint": "For your account's security, choose a new password before continuing.",
   "auth.passwordChanged": "Password changed",
+  "auth.resetLinkInvalid": "This password reset link is invalid or has expired. Request a new one.",
   "auth.idleSignedOut": "You were signed out after 8 hours of inactivity.",
 
   "role.admin": "Administrator",
